@@ -23,8 +23,10 @@ static const struct bt_data ad[] = {
 static bool parse_cb(struct bt_data *data, void *user_data) {
 	printk(" parse_cb: type=0x%x len=%d\n", data->type, data->data_len);
 	if(data->type==BT_DATA_SVC_DATA16) {
+		// pvvx Custom format
 		int16_t temperature=data->data[8]+data->data[9]*256;
-		/*float temp=(float)(data->data[8]+data->data[9]*256)/100.0f;
+		/*// "temp=*float*":
+		float temp=(float)(data->data[8]+data->data[9]*256)/100.0f;
 		printk("temp=%.2f\n", temp);*/
 		uint16_t humidity=data->data[10]+data->data[11]*256;
 		uint8_t battery_level=data->data[14];
