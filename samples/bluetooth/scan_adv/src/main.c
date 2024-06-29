@@ -14,9 +14,13 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
 
+#include <dk_buttons_and_leds.h>
+
 static bool parse_cb(struct bt_data *data, void *user_data) {
+dk_set_led_on(DK_LED3);
 	printk(" parse_cb: type=0x%x len=%d\n", data->type, data->data_len);
 	if(data->type==BT_DATA_SVC_DATA16) {
+dk_set_led_on(DK_LED4);
 		// pvvx Custom format
 		int16_t temperature=data->data[8]+data->data[9]*256;
 		/*// "temp=*float*":
@@ -25,8 +29,10 @@ static bool parse_cb(struct bt_data *data, void *user_data) {
 		uint16_t humidity=data->data[10]+data->data[11]*256;
 		uint8_t battery_level=data->data[14];
 		printk("  temperature*100=%d humidity*100=%d battery_level=%d\n", temperature, humidity, battery_level);
+dk_set_led_off(DK_LED4);
 		/*return false;
 	*/}/* else {*/
+dk_set_led_off(DK_LED3);
 		return true;
 	/*}*/
 }
@@ -34,6 +40,7 @@ static bool parse_cb(struct bt_data *data, void *user_data) {
 static void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 		    struct net_buf_simple *buf)
 {
+dk_set_led_on(DK_LED2);
 	char str[80];
 	bt_addr_le_to_str(addr,str,sizeof(str));
 
@@ -45,10 +52,18 @@ static void scan_cb(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_type,
 		printk("scan_cb(%s,%ddB,%d\n",str,rssi,adv_type);
 		bt_data_parse(buf,parse_cb,NULL);
 	}
+dk_set_led_off(DK_LED2);
 }
 
 int main(void)
 {
+	int err;
+	err = dk_leds_init();
+	if (err) {
+		printk("LEDs init failed (err %d)\n", err);
+		return 0;
+	}
+	dk_set_led_on(DK_LED1);
 struct bt_le_scan_param scan_param =
 {
     .type = BT_LE_SCAN_TYPE_PASSIVE,
@@ -59,7 +74,6 @@ struct bt_le_scan_param scan_param =
     .interval_coded = 0,
     .window_coded = 0,
 };
-	int err;
 
 	printk("Starting Scanner/Advertiser Demo\n");
 
@@ -82,5 +96,6 @@ struct bt_le_scan_param scan_param =
 		k_sleep(K_MSEC(400));
 
 	} while (1);
+dk_set_led_off(DK_LED1);
 	return 0;
 }
