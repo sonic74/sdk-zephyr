@@ -22,7 +22,10 @@ dk_set_led_on(DK_LED1);
 	if(data->type==BT_DATA_SVC_DATA16) {
 dk_set_led_on(DK_LED2);
 		// pvvx Custom format
-		int16_t temperature=data->data[8]+data->data[9]*256;
+		// https://stackoverflow.com/a/68914936
+		uint16_t tu = (uint16_t) data->data[9] << 8 | data->data[8];
+		int16_t  temperature;
+		memcpy(&temperature, &tu, sizeof temperature);
 		/*// "temp=*float*":
 		float temp=(float)(data->data[8]+data->data[9]*256)/100.0f;
 		printk("temp=%.2f\n", temp);*/
