@@ -61,18 +61,19 @@ int main(void) {
 		return 0;
 	}
 //dk_set_led_on(DK_LED1);
-struct bt_le_scan_param scan_param =
-{
-    .type = BT_LE_SCAN_TYPE_PASSIVE,
-    .options = BT_LE_SCAN_OPT_CODED,
-    .interval = 0x40, // 40ms
-    .window = 0x20, // 20ms
-    .timeout = 0,
-    .interval_coded = 0,
-    .window_coded = 0,
-};
+	// https://devzone.nordicsemi.com/f/nordic-q-a/103595/ble-1m-coded-phy-connection-and-scanning
+	struct bt_le_scan_param scan_param =
+	{
+		.type = BT_LE_SCAN_TYPE_PASSIVE,
+		.options = BT_LE_SCAN_OPT_CODED,
+		.interval = 0x40, // 40ms
+		.window = 0x20, // 20ms
+		.timeout = 0,
+		.interval_coded = 0,
+		.window_coded = 0,
+	};
 
-	printk("Starting Scanner/Advertiser Demo\n");
+	printk("Starting ATC_MiThermometer Scanner\n");
 
 	/* Initialize the Bluetooth Subsystem */
 	err = bt_enable(NULL);
