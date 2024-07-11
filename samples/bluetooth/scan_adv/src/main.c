@@ -18,7 +18,10 @@
 
 static bool parse_cb(struct bt_data *data, void *user_data) {
 dk_set_led_on(DK_LED1);
-	printk(" parse_cb: type=0x%x len=%d\n", data->type, data->data_len);
+	char buffer[3];
+	printk(" parse_cb: type=BT_DATA_%s len=%d\n", data->type==BT_DATA_FLAGS?"FLAGS":
+	                                              data->type==BT_DATA_NAME_COMPLETE?"NAME_COMPLETE":
+	                                              data->type==BT_DATA_SVC_DATA16?"SVC_DATA16":itoa(data->type,buffer,10), data->data_len);
 	if(data->type==BT_DATA_SVC_DATA16) {
 dk_set_led_on(DK_LED2);
 		// pvvx Custom format
@@ -45,8 +48,10 @@ dk_set_led_on(DK_LED3);
 	char str[80];
 	bt_addr_le_to_str(addr,str,sizeof(str));
 	char* prefix="A4:C1:38";
-	if(strncmp(prefix,str,sizeof(prefix))==0) {		
-		printk("scan_cb(%s,%ddB,%d\n",str,rssi,adv_type);
+	if(strncmp(prefix,str,sizeof(prefix))==0) {
+		char buffer[3];
+		printk("scan_cb(%s,%ddB,BT_GAP_ADV_TYPE_%s\n",str,rssi,adv_type==BT_GAP_ADV_TYPE_ADV_IND?"ADV_IND":
+		                                                       adv_type==BT_GAP_ADV_TYPE_EXT_ADV?"EXT_ADV":itoa(adv_type,buffer,10));
 		bt_data_parse(buf,parse_cb,NULL);
 	}
 dk_set_led_off(DK_LED3);
